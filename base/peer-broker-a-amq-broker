@@ -22,6 +22,9 @@ spec:
     sslSecret: amq-broker-certificate
   deploymentPlan:
     clustered: false
+    extraMounts:
+      secrets:
+      - "base-bp"
     extraVolumeMounts:
       - mountPath: /opt/amq-broker/data
         name: extra-volume
