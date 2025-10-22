@@ -1,0 +1,40 @@
+apiVersion: broker.amq.io/v1beta1
+kind: ActiveMQArtemis
+metadata:
+  name: peer-broker-a
+spec:
+  acceptors:
+    - expose: true
+      name: ext-acceptor
+      port: 61626
+      protocols: CORE
+      sslEnabled: true
+      sslSecret: amq-broker-certificate
+#  brokerProperties:
+#    - HAPolicyConfiguration=SHARED_STORE_PRIMARY
+#    - journalDirectory=/opt/amq-broker/data/journal
+#    - 'pagingDirectory=/opt/amq-broker/data/paging,'
+#    - bindingsDirectory=/opt/amq-broker/data/bindings
+#    - largeMessagesDirectory=/opt/amq-broker/data/largemessages
+  console:
+    expose: true
+    sslEnabled: true
+    sslSecret: amq-broker-certificate
+  deploymentPlan:
+    clustered: false
+    extraVolumeMounts:
+      - mountPath: /opt/amq-broker/data
+        name: extra-volume
+    extraVolumes:
+      - name: extra-volume
+        persistentVolumeClaim:
+          claimName: shared-volume
+    livenessProbe:
+      exec:
+        command:
+          - test
+          - '-f'
+          - /home/jboss/amq-broker/lock/cli.lock
+    persistenceEnabled: false
+    requireLogin: true
+    size: 1
